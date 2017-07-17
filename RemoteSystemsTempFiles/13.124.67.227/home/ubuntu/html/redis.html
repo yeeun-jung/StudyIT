@@ -1,0 +1,163 @@
+<html> 
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+<body>
+<div id="redis_div">
+	<table border="1" width="50%" height="300px">
+		<tr>
+			<td colspan="2" align="center">INPUT</td>
+		</tr>
+		<tr>
+			<td width="50%" align="center">Key</td>
+			<td align="center"><input type="text" id="key" size="35"></td>
+		</tr>
+		<tr>
+			<td align="center">value</td>
+			<td align="center"><input type="text" id="value" size="35"></td>
+		</tr>
+		<tr>
+			<td align="center">Expire Time (sec)</td>
+			<td align="center"><input type="text" id="expire" value="300" size="35"></td>
+		</tr>
+		<tr>
+			<td colspan="2" align="right"><input type="button" value="占쎌뿯占쎌젾" id="insert">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+		</tr>
+	</table>
+	<br>
+	<br>
+	<br>
+	<br>
+	<table border="1" width="50%" height="300px">
+		<tr>
+			<td colspan="2" align="center">OUTPUT</td>
+		</tr>
+		<tr>
+			<td width="50%" align="center">Key</td>
+			<td align="center"><input type="text" id="search_key" size="35"></td>
+		</tr>
+		<tr>
+			<td colspan="2" align="right"><input type="button" value="野껓옙占쎄퉳" id="search">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+		</tr>
+		<tr>
+			<td align="center">value</td>
+			<td align="center"><input type="text" id="search_value" size="35"></td>
+		</tr>
+	</table>
+</div>
+</body>
+<script src="//code.jquery.com/jquery.min.js"></script>
+<script language="javascript">
+    var url="controller.php";
+
+    $(document).ready(function(){
+        $('#insert').click(function(){
+            input();
+        });
+
+        $('#search').click(function(){
+            output();
+        });
+
+        $("#value").keypress(function (e) {
+            if (e.which == 13){
+                input();
+            }
+        });
+
+        $("#search_key").keypress(function (e) {
+            if (e.which == 13){
+                output();
+            }
+        });
+    });
+
+
+
+
+
+    function input(){
+        var key = $('#key').val();
+        var value = $('#value').val();
+        var expire = $('#expire').val();
+
+        if(!key){
+            alert('key�몴占� 占쎌뿯占쎌젾占쎈퉸雅뚯눘苑�占쎌뒄');
+            $('#key').focus();
+            return false;
+        }
+        if(!value){
+            alert('value�몴占� 占쎌뿯占쎌젾占쎈퉸雅뚯눘苑�占쎌뒄');
+            $('#value').focus();
+            return false;
+        }
+        if(!expire){
+            alert('expire�몴占� 占쎌뿯占쎌젾占쎈퉸雅뚯눘苑�占쎌뒄');
+            $('#expire').focus();
+            return false;
+        }
+
+        var params="mode=insert&key="+key+"&value="+value+"&expire="+expire;
+        $.ajax({
+            type:"POST",
+            url:url,
+            data:params,
+            success:function(data){
+                var result = $.parseJSON(data);
+                if(result.result == 'ok'){
+                    alert('占쎌뿯占쎌젾占쎌끏�뙴占�');
+                    $('#key').val('');
+                    $('#value').val('');
+                    $('#key').focus();
+                }else if(result.result == 'redis fail'){
+                    alert('[error-01] - 占쎈뻻占쎈뮞占쎈�� 占쎌삢占쎈막 占쎌뿯占쎈빍占쎈뼄. �꽴占썹뵳�딆쁽占쎈퓠野껓옙 �눧紐꾩벥占쎈릭占쎄쉭占쎌뒄');
+                    $('#redis_div').hide();
+                    return false;
+                }else if(result.result == 'duplicate'){
+                    alert('[error-02] - 餓λ쵎�궗占쎈┷占쎈뮉 占쎄텕揶쏉옙 鈺곕똻�삺占쎈�占쎈빍占쎈뼄. 占쎈뼄占쎈뻻 占쎌뿯占쎌젾占쎈퉸雅뚯눘苑�占쎌뒄.');
+                    $('#key').val('');
+                    $('#value').val('');
+                    $('#key').focus();
+                    return false;
+                }else{
+                    alert('[error-03] - 占쎌굙疫꿸퀣�뒄 占쎈륫占쏙옙 �눧紐꾩젫揶쏉옙 獄쏆뮇源�占쎈뻥占쎈뮸占쎈빍占쎈뼄. 占쎈뼄占쎈뻻 占쎈뻻占쎈즲占쎈퉸 雅뚯눘苑�占쎌뒄.');
+                    return false;
+                }
+            },
+            error:function(e){
+                alert(e.responseText);
+            }
+        });
+    }
+
+    function output(){
+        var search_key = $('#search_key').val();
+
+        if(!search_key){
+            alert('野껓옙占쎄퉳 key�몴占� 占쎌뿯占쎌젾占쎈퉸雅뚯눘苑�占쎌뒄');
+            $('#search_key').focus();
+            return false;
+        }
+
+        var params="mode=search&key="+search_key;
+        $.ajax({
+            type:"POST",
+            url:url,
+            data:params,
+            success:function(data){
+                var result = jQuery.parseJSON(data);
+                if(result.result=='ok'){
+                    $('#search_value').val(result.value);
+                }else{
+                    alert('[error-04] - 占쎈퉸占쎈뼣占쎄텕揶쏉옙 鈺곕똻�삺占쎈릭筌욑옙 占쎈륫占쎈뮸占쎈빍占쎈뼄');
+                    $('#search_key').focus();
+                    return false;
+                }
+            },
+            error:function(e){
+                alert(e.responseText);
+            }
+        });
+    }
+</script>
+</html>
