@@ -8,7 +8,7 @@ public class ExampleActivity {
         /*
             server api 호출
          */
-        //테스트
+        //테
     Call<RestaurantDetailDto> callRestaurantDetailInfo = kindPickyEactingService.restaurantDetailInfo(restaurantId);
 
         callRestaurantDetailInfo.enqueue(new Callback<RestaurantDetailDto>() {
